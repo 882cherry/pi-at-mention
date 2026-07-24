@@ -1,0 +1,25 @@
+{
+  "name": "pi-at-mention",
+  "version": "0.1.0",
+  "description": "Pi extension: @-mention autocomplete + direct delegation to subagents",
+  "author": "882cherry",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["pi-package", "pi", "subagents", "autocomplete", "delegation"],
+  "pi": {
+    "extensions": ["./extensions/index.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "files": [
+    "extensions/",
+    "agents/",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/882cherry/pi-at-mention.git"
+  }
+}
