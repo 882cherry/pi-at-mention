@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 (2025-07-28)
+
+- Docs: 修复 README 开发章节中多余的 markdown code fence
+
 ## 0.1.1 (2025-07-24)
 
 - Fix: 修复模块加载时因 agent 文件未安装而提前退出导致 @ 补全永不生效的致命 Bug

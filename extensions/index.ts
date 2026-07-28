@@ -17,7 +17,7 @@ const STATE_FILE = path.join(STATE_DIR, "state.json");
 const AGENT_TARGET_DIR = path.join(os.homedir(), ".pi", "agent", "agents");
 const SETTINGS_FILE = path.join(os.homedir(), ".pi", "agent", "settings.json");
 const ORCHESTRATOR_MARKER = "## Your Role: Workflow Orchestrator";
-const CURRENT_VERSION = "0.1.1";
+const CURRENT_VERSION = "0.1.2";
 
 // agents/ directory relative to this extension file
 const AGENT_SRC_DIR = path.resolve(

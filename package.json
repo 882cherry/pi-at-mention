@@ -1,6 +1,6 @@
 {
   "name": "pi-at-mention",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Pi extension: @-mention autocomplete + direct delegation to subagents",
   "author": "882cherry",
   "license": "MIT",
