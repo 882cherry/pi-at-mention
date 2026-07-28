@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 (2025-07-24)
+
+- Fix: 修复模块加载时因 agent 文件未安装而提前退出导致 @ 补全永不生效的致命 Bug
+- Fix: agentList 改为每次事件动态获取，/mention-setup 后无需重启即生效
+
 ## 0.1.0 (2025-07-24)
 
 - Initial release

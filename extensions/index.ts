@@ -17,7 +17,7 @@ const STATE_FILE = path.join(STATE_DIR, "state.json");
 const AGENT_TARGET_DIR = path.join(os.homedir(), ".pi", "agent", "agents");
 const SETTINGS_FILE = path.join(os.homedir(), ".pi", "agent", "settings.json");
 const ORCHESTRATOR_MARKER = "## Your Role: Workflow Orchestrator";
-const CURRENT_VERSION = "0.1.0";
+const CURRENT_VERSION = "0.1.1";
 
 // agents/ directory relative to this extension file
 const AGENT_SRC_DIR = path.resolve(
@@ -580,16 +580,6 @@ export default function (pi: ExtensionAPI) {
   });
 
   // -----------------------------------------------------------------------
-  // agentList is computed once at startup from disk
-  // -----------------------------------------------------------------------
-  const agentList = discoverAgents();
-  if (agentList.length === 0) {
-    // No agents found at all — extension is effectively useless
-    return;
-  }
-  const agentNames = new Set(agentList.map((a) => a.name));
-
-  // -----------------------------------------------------------------------
   // session_start: setup check + autocomplete registration
   // -----------------------------------------------------------------------
   pi.on("session_start", async (_event, ctx) => {
@@ -605,11 +595,11 @@ export default function (pi: ExtensionAPI) {
       return;
     }
 
-    // 2. Check state and auto-repair if needed
+    // 2. Check state and auto-repair if needed (installs agent files on first run)
     const state = loadState();
 
     if (!state || !state.setupCompleted) {
-      // First run — execute setup
+      // First run — execute setup (installs agent files if needed)
       await runSetup(ctx);
     } else {
       // Normal startup — check agent file integrity
@@ -623,7 +613,6 @@ export default function (pi: ExtensionAPI) {
           `以下 ${missingFiles.length} 个 agent 文件已被删除：\n${missingFiles.join("\n")}\n\n是否重新安装？`,
         );
         if (reinstall) {
-          // Re-run setup in non-interactive install mode
           ctx.ui.notify(
             `${PACKAGE_NAME}: 重新安装缺失的 agent 文件中...`,
             "info",
@@ -647,7 +636,17 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // 3. Register autocomplete
+    // 3. Discover agents dynamically (after potential setup above)
+    const agentList = discoverAgents();
+    if (agentList.length === 0) {
+      ctx.ui.notify(
+        `${PACKAGE_NAME}: 未发现任何 agent 文件，@ 补全不可用。运行 /mention-setup 安装内置 agent`,
+        "warning",
+      );
+      return;
+    }
+
+    // 4. Register autocomplete with current agent list
     if (ctx.ui && typeof ctx.ui.addAutocompleteProvider === "function") {
       ctx.ui.addAutocompleteProvider(createAutocompleteWrapper(agentList));
     }
@@ -659,6 +658,10 @@ export default function (pi: ExtensionAPI) {
   pi.on("before_agent_start", async (event) => {
     if (process.env.PI_SUBAGENT_CHILD === "1") return;
     if (event.systemPrompt.includes(ORCHESTRATOR_MARKER)) return;
+
+    // Discover agents dynamically so changes after /mention-setup take effect
+    const agentList = discoverAgents();
+    if (agentList.length === 0) return;
 
     return {
       systemPrompt:
@@ -675,6 +678,10 @@ export default function (pi: ExtensionAPI) {
   pi.on("input", async (event) => {
     const result = parseMention(event.text);
     if (!result) return { action: "continue" };
+
+    // Discover agents dynamically so newly installed agents are recognized
+    const agentList = discoverAgents();
+    const agentNames = new Set(agentList.map((a) => a.name));
     if (!agentNames.has(result.agentName)) return { action: "continue" };
 
     return {
