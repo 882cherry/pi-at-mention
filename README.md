@@ -165,7 +165,6 @@ pi install .
 # 或通过 -e 临时加载
 pi -e ./extensions/index.ts
 ```
-```
 
 ## 文件结构
 
